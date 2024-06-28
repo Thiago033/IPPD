@@ -60,7 +60,7 @@ struct node* init_list(struct node* p) {
 }
 
 int main(int argc, char *argv[]) {
-    // omp_set_num_threads(1);
+    omp_set_num_threads(4);
 
     double start, end;
     struct node *p=NULL;
