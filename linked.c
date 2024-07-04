@@ -96,7 +96,7 @@ int main(int argc, char *argv[]) {
     p = head;
 
     while (p != NULL) {
-        printf("%d : %d\n", p->data, p->fibdata);
+        printf("%d : %d\n", p->data, p->fibdata);i
 
         temp = p->next;
     
