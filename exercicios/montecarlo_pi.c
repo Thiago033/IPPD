@@ -1,3 +1,6 @@
+// mpicc -o montecarlo_pi montecarlo_pi.c
+// mpirun -np 4 ./montecarlo_pi 1000000
+
 #include <mpi.h>
 #include <stdio.h>
 #include <stdlib.h>

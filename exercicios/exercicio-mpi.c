@@ -1,3 +1,6 @@
+// mpicc -o soma_vetores soma_vetores.c
+// mpirun -np 4 ./soma_vetores
+
 #include <mpi.h>
 #include <stdio.h>
 #include <stdlib.h>
