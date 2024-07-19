@@ -80,7 +80,7 @@ void mandelbrot(Pixel *img, int width, int height, int max_iter, int start_row, 
                 x = xtemp;
                 iteration++;
             }
-            Pixel *p = &img[(py - start_row) * width + px]; // Ajuste de índice
+            Pixel *p = &img[py * width + px];
             if (iteration == max_iter) {
                 p->r = 0;
                 p->g = 0;
@@ -104,47 +104,29 @@ int main(int argc, char *argv[]) {
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 
-    if (size < 2) {
-        fprintf(stderr, "Este programa requer pelo menos 2 processos MPI.\n");
-        MPI_Abort(MPI_COMM_WORLD, 1);
-    }
-
     Pixel *img = NULL;
     if (rank == 0) {
         img = (Pixel *)malloc(width * height * sizeof(Pixel));
         if (img == NULL) {
-            fprintf(stderr, "Erro ao alocar memória para a imagem\n");
+            fprintf(stderr, "Error allocating memory\n");
             MPI_Abort(MPI_COMM_WORLD, 1);
         }
     }
 
     int rows_per_proc = height / size;
-    int remainder = height % size;
-
-    Pixel *local_img = (Pixel *)malloc(width * (rows_per_proc + 1) * sizeof(Pixel));
+    Pixel *local_img = (Pixel *)malloc(width * rows_per_proc * sizeof(Pixel));
     if (local_img == NULL) {
-        fprintf(stderr, "Erro ao alocar memória para a imagem local\n");
+        fprintf(stderr, "Error allocating memory\n");
         MPI_Abort(MPI_COMM_WORLD, 1);
     }
 
     int start_row = rank * rows_per_proc;
-    int end_row = (rank == size - 1) ? (start_row + rows_per_proc + remainder) : (start_row + rows_per_proc);
-
-    printf("Processo %d calculando linhas de %d a %d\n", rank, start_row, end_row);
-
+    int end_row = (rank + 1) * rows_per_proc;
     mandelbrot(local_img, width, height, max_iter, start_row, end_row);
 
-    int sendcounts[size];
-    int displs[size];
-
-    for (int i = 0; i < size; i++) {
-        sendcounts[i] = (i == size - 1) ? (rows_per_proc + remainder) * width * sizeof(Pixel) : rows_per_proc * width * sizeof(Pixel);
-        displs[i] = i * rows_per_proc * width * sizeof(Pixel);
-    }
-
-    MPI_Gatherv(local_img, (end_row - start_row) * width * sizeof(Pixel), MPI_BYTE,
-                img, sendcounts, displs, MPI_BYTE,
-                0, MPI_COMM_WORLD);
+    MPI_Gather(local_img, width * rows_per_proc * sizeof(Pixel), MPI_BYTE,
+               img, width * rows_per_proc * sizeof(Pixel), MPI_BYTE,
+               0, MPI_COMM_WORLD);
 
     if (rank == 0) {
         write_bmp("mandelbrot.bmp", img, width, height);
