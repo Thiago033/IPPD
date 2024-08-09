@@ -1,3 +1,6 @@
+// Compile: mpicc -o matrix_mpi matrix_mpi.c -lm
+// Execute: mpirun -np (num_procs) ./matrix_mpi
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
