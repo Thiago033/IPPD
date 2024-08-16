@@ -1,0 +1,11 @@
+prefix=/home/thiago/Repositorio/IPPD/projeto2/target/debug/build/libffi-sys-4425a0f6be89b756/out/libffi-root
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+toolexeclibdir=${libdir}/../lib
+includedir=${prefix}/include
+
+Name: libffi
+Description: Library supporting Foreign Function Interfaces
+Version: 3.4.4
+Libs: -L${toolexeclibdir} -lffi
+Cflags: -I${includedir}
